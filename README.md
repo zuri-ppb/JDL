@@ -35,4 +35,8 @@
 7. **Region**
 - Include MR anchor data
 - Design interactive objects
-- Support region unlocking conditions and adjacent region associations
+- Support region 
+locking conditions and adjacent region associations
+
+![studentgame](https://github.com/user-attachments/assets/debeb517-5c34-4d0f-bdd8-5a6348fe3714)
+
