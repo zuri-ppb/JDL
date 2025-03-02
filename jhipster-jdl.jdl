@@ -1,0 +1,191 @@
+entity User {
+  @Id
+  userId String required
+  username String required
+  avatar String
+  level Integer required
+  exp Integer required
+  energy Integer required
+  money Integer required
+  happiness Integer required
+  intelligence Integer required
+  socialCredit Integer required
+  backgroundStory TextBlob
+  dormitoryId String required
+  lastLoginTime ZonedDateTime
+  createTime ZonedDateTime required
+}
+
+entity UserInventory {
+  @Id
+  inventoryId String required
+  userId String required
+  itemId String required
+  quantity Integer required
+  isEquipped Boolean
+  obtainTime ZonedDateTime required
+}
+
+entity UserLeaderboard {
+  @Id
+  recordId String required
+  userId String required
+  leaderboardId String required
+  score Integer required
+  rank Integer
+  seasonId String
+  updateTime ZonedDateTime required
+}
+
+entity Task {
+  @Id
+  taskId String required
+  taskName String required
+  taskType String required // 日常任务、主线任务、支线任务、社交任务、学习任务
+  description TextBlob required
+  triggerCondition TextBlob required
+  completionCondition TextBlob required
+  difficulty Integer required // 1-5
+  expReward Integer
+  moneyReward Integer
+  itemReward String // itemId
+  timeLimit Integer // 分钟数，如为0则无时间限制
+  isRepeatable Boolean required
+  cooldownTime Integer // 小时数，重复任务的冷却时间
+  prerequisiteTasks String // 前置任务ID，用逗号分隔
+}
+
+entity UserTask {
+  @Id
+  userTaskId String required
+  userId String required
+  taskId String required
+  status String required // 未接取、进行中、已完成、失败
+  progress Integer // 当前进度（百分比）
+  startTime ZonedDateTime
+  endTime ZonedDateTime
+  isTracked Boolean // 是否在追踪列表中
+}
+
+entity Item {
+  @Id
+  itemId String required
+  itemName String required
+  itemType String required // 消耗品、装备、收藏品、学习资料、装饰品
+  rarity String required // 普通、稀有、史诗、传说
+  description TextBlob
+  effect TextBlob required
+  durability Integer // 耐久度，如为0则无限耐久
+  cooldown Integer // 使用冷却时间（秒）
+  stackable Boolean required // 是否可堆叠
+  marketValue Integer required // 商店价值
+  tradeable Boolean required // 是否可交易
+  imageUrl String
+}
+
+entity MiniGame {
+  @Id
+  gameId String required
+  gameName String required
+  gameType String required // 选择题、连线题、拼图、记忆力、快速反应
+  difficulty Integer required // 1-5
+  subject String required // 学科分类
+  question TextBlob required
+  options TextBlob // JSON格式的选项
+  answer String required
+  explanation TextBlob
+  timeLimit Integer // 秒数
+  expReward Integer required
+  intelligenceReward Integer required
+  itemReward String // itemId
+}
+
+entity UserMiniGameRecord {
+  @Id
+  recordId String required
+  userId String required
+  gameId String required
+  score Integer required
+  timeTaken Integer // 秒数
+  isCorrect Boolean required
+  attemptTime ZonedDateTime required
+}
+
+entity Leaderboard {
+  @Id
+  leaderboardId String required
+  leaderboardName String required
+  leaderboardType String required // 学术、社交、财富、综合能力
+  description TextBlob
+  resetFrequency String // 每日、每周、每月、每学期、永久
+  currentSeasonId String
+  startTime ZonedDateTime
+  endTime ZonedDateTime
+}
+
+entity LeaderboardSeason {
+  @Id
+  seasonId String required
+  leaderboardId String required
+  seasonName String required
+  startTime ZonedDateTime required
+  endTime ZonedDateTime required
+  rewards TextBlob // JSON格式的奖励信息
+  isActive Boolean required
+}
+
+entity Log {
+  @Id
+  logId String required
+  userId String required
+  eventType String required // 登录、任务完成、道具获取、成绩变化等
+  eventData TextBlob required
+  timestamp ZonedDateTime required
+  location String // 发生位置
+}
+
+entity Region {
+  @Id
+  regionId String required
+  regionName String required
+  regionType String required // 教室、宿舍、食堂、图书馆、操场、商店
+  description TextBlob
+  anchorData TextBlob required // JSON格式的MR锚点数据
+  interactableObjects TextBlob // JSON格式的可交互对象列表
+  adjacentRegions String // 相邻区域ID，用逗号分隔
+  unlockCondition String // 解锁条件
+  backgroundMusic String // 背景音乐资源
+  ambientSounds String // 环境音效资源
+}
+
+relationship OneToMany {
+  User to UserInventory{user}
+  User to UserLeaderboard{user}
+  User to UserTask{user}
+  User to UserMiniGameRecord{user}
+  User to Log{user}
+  Task to UserTask{task}
+  Item to UserInventory{item}
+  MiniGame to UserMiniGameRecord{miniGame}
+  Leaderboard to UserLeaderboard{leaderboard}
+  Leaderboard to LeaderboardSeason{leaderboard}
+  Region to User{dormitory}
+}
+
+// 设置
+application {
+  config {
+    baseName MRCampusLife
+    applicationType monolith
+    packageName com.mrcampuslife
+    authenticationType jwt
+    databaseType sql
+    devDatabaseType h2Disk
+    prodDatabaseType mysql
+    cacheProvider ehcache
+    enableHibernateCache true
+    clientFramework angular
+    languages [zh-cn, en]
+  }
+  entities all
+}
